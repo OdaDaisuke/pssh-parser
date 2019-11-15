@@ -83,6 +83,18 @@ func (p *PSSH) Parse() {
 	}
 }
 
+func (p *PSSH) Print() {
+	fmt.Println("[PSSH Summary]")
+	fmt.Println("Size          ", p.Summary.SizeHex)
+	fmt.Println("Size(decimal) ", p.Summary.SizeDecimal)
+	fmt.Println("Type          ", p.Summary.Type)
+	fmt.Println("Version       ", p.Summary.Version)
+	fmt.Println("Flag          ", p.Summary.Flag)
+	fmt.Println("DRM           ", p.Summary.DRMSystemID)
+	fmt.Println("DataSize      ", p.Summary.DataSize)
+	fmt.Println("Data          ", p.Summary.Data)
+}
+
 func paddingNumber(n string) string {
 	b := "00" + n
 	return b[len(b)-2:]

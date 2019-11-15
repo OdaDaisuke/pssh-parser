@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/base64"
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -47,15 +46,7 @@ func runMain(file, psshStr string, encoded bool) {
 
 	pssh := lib.NewPSSH(psshBox)
 	pssh.Parse()
-
-	fmt.Println("psshSize", pssh.Summary.SizeHex)
-	fmt.Println("psshZie(decimal)", pssh.Summary.SizeDecimal)
-	fmt.Println("type", pssh.Summary.Type)
-	fmt.Println("version", pssh.Summary.Version)
-	fmt.Println("flag", pssh.Summary.Flag)
-	fmt.Println("drm", pssh.Summary.DRMSystemID)
-	fmt.Println("psshDataSize", pssh.Summary.DataSize)
-	fmt.Println("psshData", pssh.Summary.Data)
+	pssh.Print()
 }
 
 func checkPanic(err error) {
