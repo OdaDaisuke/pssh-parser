@@ -42,8 +42,8 @@ func TestParse(t *testing.T) {
 	if pssh.Summary.Flag != "000000" {
 		t.Errorf("Summary.Flag must be 000000 got %s", pssh.Summary.Flag)
 	}
-	if pssh.Summary.DRMSystemID != "edef8ba979d64acea3c827dcd51d21ed" {
-		t.Errorf("Summary.DRMSystemID must be edef8ba979d64acea3c827dcd51d21ed got %s", pssh.Summary.DRMSystemID)
+	if pssh.Summary.DRMSystemID != "edef8ba979d64acea3c827dcd51d21ed(widevine)" {
+		t.Errorf("Summary.DRMSystemID must be edef8ba979d64acea3c827dcd51d21ed(widevine) got %s", pssh.Summary.DRMSystemID)
 	}
 	if pssh.Summary.DataSize != 2 {
 		t.Errorf("Summary.Data must be 70737368 got %s", pssh.Summary.Type)

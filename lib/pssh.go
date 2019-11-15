@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 )
 
 // PSSH represents mp4 FullBox
@@ -65,6 +66,13 @@ func (p *PSSH) Parse() {
 	version := p.HexBin[16:18]
 	flag := p.HexBin[18:24]
 	drmSystem := p.HexBin[24:56]
+	valid, drmName := p.validateSystemID(drmSystem)
+	if !valid {
+		log.Printf("Unsupported DRM %s\n", drmSystem)
+	} else {
+		drmSystem = fmt.Sprintf("%s(%s)", drmSystem, drmName)
+	}
+
 	dataSize, err := strconv.ParseInt(p.HexBin[56:64], 16, 64)
 	if err != nil {
 		log.Println("hex int cast error")
@@ -83,6 +91,7 @@ func (p *PSSH) Parse() {
 	}
 }
 
+// Print display PSSH summary
 func (p *PSSH) Print() {
 	fmt.Println("[PSSH Summary]")
 	fmt.Println("Size          ", p.Summary.SizeHex)
@@ -93,6 +102,51 @@ func (p *PSSH) Print() {
 	fmt.Println("DRM           ", p.Summary.DRMSystemID)
 	fmt.Println("DataSize      ", p.Summary.DataSize)
 	fmt.Println("Data          ", p.Summary.Data)
+}
+
+// cf. https://dashif.org/identifiers/content_protection/
+func (p *PSSH) validateSystemID(s string) (bool, string) {
+	// Remove hyphen
+	sArr := strings.Split(s, "-")
+	s = strings.Join(sArr, "")
+
+	// DRM System ID for only supports DASH
+	type SystemID struct {
+		ID   string
+		Name string
+	}
+	systemIDs := [...]SystemID{
+		{
+			ID:   "edef8ba979d64acea3c827dcd51d21ed",
+			Name: "widevine",
+		},
+		{
+			ID:   "9a04f07998404286ab92e65be0885f95",
+			Name: "playready",
+		},
+		{
+			ID:   "F239E769EFA348509C16A903C6932EFB",
+			Name: "primetime",
+		},
+		{
+			ID:   "45d481cb-8fe0-49c0-ada9-ab2d2455b2f2",
+			Name: "corecrypt",
+		},
+		{
+			ID:   "1077efecc0b24d02ace33c1e52e2fb4b",
+			Name: "w3c",
+		},
+		{
+			ID:   "6dd8b3c345f44a68bf3a64168d01a4a6",
+			Name: "abv",
+		},
+	}
+	for _, sid := range systemIDs {
+		if strings.EqualFold(sid.ID, s) {
+			return true, sid.Name
+		}
+	}
+	return false, ""
 }
 
 func paddingNumber(n string) string {
