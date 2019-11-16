@@ -35,12 +35,14 @@ type PSSHSummary struct {
 
 	// DRM System id defined in DASH IF
 	DRMSystemID string
+	DRMName     string
 
 	// Size of PSSH Data part
 	DataSize int64
 
 	// PSSH Data body
-	Data string
+	DataHex string
+	DataRaw []byte
 }
 
 // NewPSSH generate PSSH
@@ -74,15 +76,14 @@ func (p *PSSH) Parse() {
 	valid, drmName := p.validateSystemID(drmSystem)
 	if !valid {
 		log.Printf("Unsupported DRM %s\n", drmSystem)
-	} else {
-		drmSystem = fmt.Sprintf("%s(%s)", drmSystem, drmName)
 	}
 
 	dataSize, err := strconv.ParseInt(p.HexBin[56:64], 16, 64)
 	if err != nil {
 		log.Println("hex int cast error")
 	}
-	data := p.HexBin[64:]
+	dataHex := p.HexBin[64:]
+	dataRaw := p.Data[64:]
 
 	p.Summary = &PSSHSummary{
 		Type:        psshType,
@@ -91,8 +92,10 @@ func (p *PSSH) Parse() {
 		Version:     version,
 		Flag:        flag,
 		DRMSystemID: drmSystem,
+		DRMName:     drmName,
 		DataSize:    dataSize,
-		Data:        data,
+		DataRaw:     dataRaw,
+		DataHex:     dataHex,
 	}
 }
 
@@ -105,15 +108,16 @@ func (p *PSSH) Print() {
 	fmt.Println("Version       ", p.Summary.Version)
 	fmt.Println("Flag          ", p.Summary.Flag)
 	fmt.Println("DRM           ", p.Summary.DRMSystemID)
+	fmt.Println("DRM Name      ", p.Summary.DRMName)
 	fmt.Println("DataSize      ", p.Summary.DataSize)
-	fmt.Println("Data          ", p.Summary.Data)
+	fmt.Println("Data          ", p.Summary.DataHex)
 
 	// TODO: support PlayReady parse
 	switch strings.ToLower(p.Summary.DRMSystemID) {
 	case WIDEVINE_SYSTEM_ID:
 		// parse
 		wv := &pb.WidevineCencHeader{}
-		if err := proto.Unmarshal([]byte(p.Summary.Data), wv); err != nil {
+		if err := proto.Unmarshal(p.Summary.DataRaw, wv); err != nil {
 			log.Print("could not unmarshal Widevine proto")
 		}
 		fmt.Println("Parsed Data  ", wv)
