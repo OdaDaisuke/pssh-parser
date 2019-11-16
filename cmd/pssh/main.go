@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 
-	lib "github.com/OdaDaisuke/pssh-parser/lib"
+	lib "github.com/OdaDaisuke/pssh-parser/internal/apps/pssh"
 )
 
 func main() {

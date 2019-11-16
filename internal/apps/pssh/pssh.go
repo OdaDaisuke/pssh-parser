@@ -5,7 +5,12 @@ import (
 	"log"
 	"strconv"
 	"strings"
+
+	"github.com/OdaDaisuke/pssh-parser/pb"
+	proto "github.com/golang/protobuf/proto"
 )
+
+const WIDEVINE_SYSTEM_ID = "edef8ba979d64acea3c827dcd51d21ed"
 
 // PSSH represents mp4 FullBox
 type PSSH struct {
@@ -102,6 +107,17 @@ func (p *PSSH) Print() {
 	fmt.Println("DRM           ", p.Summary.DRMSystemID)
 	fmt.Println("DataSize      ", p.Summary.DataSize)
 	fmt.Println("Data          ", p.Summary.Data)
+
+	// TODO: support PlayReady parse
+	switch strings.ToLower(p.Summary.DRMSystemID) {
+	case WIDEVINE_SYSTEM_ID:
+		// parse
+		wv := &pb.WidevineCencHeader{}
+		if err := proto.Unmarshal([]byte(p.Summary.Data), wv); err != nil {
+			log.Print("could not unmarshal Widevine proto")
+		}
+		fmt.Println("Parsed Data  ", wv)
+	}
 }
 
 // cf. https://dashif.org/identifiers/content_protection/
@@ -117,7 +133,7 @@ func (p *PSSH) validateSystemID(s string) (bool, string) {
 	}
 	systemIDs := [...]SystemID{
 		{
-			ID:   "edef8ba979d64acea3c827dcd51d21ed",
+			ID:   WIDEVINE_SYSTEM_ID,
 			Name: "widevine",
 		},
 		{

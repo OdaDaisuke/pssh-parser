@@ -22,11 +22,9 @@ func TestParse(t *testing.T) {
 	psshBox, _ := base64.StdEncoding.DecodeString(testDataBin)
 	pssh := NewPSSH(psshBox)
 	pssh.Parse()
-	pssh.Print()
 	if pssh.Summary == nil {
 		t.Error("pssh summary must not be nil")
 	}
-
 	if pssh.Summary.SizeHex != "000000c6" {
 		t.Errorf("Summary.SizeHex must be 000000c6 got %s", pssh.Summary.SizeHex)
 	}

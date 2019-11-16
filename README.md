@@ -7,7 +7,7 @@ In DRM context, PSSH is used in MPEG-DASH content protectection.
 ## Installation
 
 ```shell
-go get github.com/OdaDaisuke/pssh-parser/cmd
+go get github.com/OdaDaisuke/pssh-parser/cmd/pssh
 ```
 
 ## Usage
